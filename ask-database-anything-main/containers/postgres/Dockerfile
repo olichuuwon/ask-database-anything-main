@@ -1,5 +1,5 @@
 # Use the official PostgreSQL image as the base image
-FROM postgres:13
+FROM bitnami/postgresql:16.3.0-debian-12-r14
 
 # Set environment variables for PostgreSQL
 ENV POSTGRES_USER=user
