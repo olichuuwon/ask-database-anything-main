@@ -1,0 +1,18 @@
+# Langchain dependencies
+langchain-core
+langchain-community
+langchain-openai
+
+# Data handling and presentation
+prettytable
+pandas
+
+# Database related
+sqlalchemy
+psycopg2-binary
+
+# Web application framework
+streamlit
+
+# Environment variables
+python-dotenv

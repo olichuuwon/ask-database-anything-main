@@ -1,0 +1,43 @@
+services:
+  database:
+    image: "postgres:13"
+    environment:
+      POSTGRES_DB: chinook
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+    volumes:
+      - ./containers/postgres/initdb:/docker-entrypoint-initdb.d
+    networks:
+      - app_network
+
+  model:
+    image: "ollama/ollama"
+    volumes:
+      - ./data/ollama:/root/.ollama
+    ports:
+      - "11434:11434"
+    networks:
+        - app_network
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            count: 1
+            capabilities: [gpu]
+
+  application:  # Streamlit application service definition
+    build: ./containers/streamlit/  # Specify the directory of the Dockerfile
+    environment:
+      - DB_HOST=database  # Use the service name 'db' for database host
+    ports:
+      - "8501:8501"  # Default port for Streamlit
+    depends_on:
+      - database  # This service depends on 'db' service
+      - model  # This service depends on 'model' service
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
