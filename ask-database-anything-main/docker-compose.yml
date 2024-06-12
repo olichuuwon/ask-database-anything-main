@@ -6,14 +6,14 @@ services:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: pass
     volumes:
-      - ./containers/postgres/initdb:/docker-entrypoint-initdb.d
+      - ./containers/postgres/initdb:/docker-entrypoint-initdb.d:Z
     networks:
       - app_network
 
   model:
     image: "ollama/ollama"
     volumes:
-      - ./data/ollama:/root/.ollama
+      - ./data/ollama:/root/.ollama:Z
     ports:
       - "11434:11434"
     networks:
