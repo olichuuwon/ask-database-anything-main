@@ -13,7 +13,7 @@ services:
   model:
     image: "ollama/ollama"
     volumes:
-      - ./data/ollama:/root/.ollama:Z
+      - ./data/ollama:/root/ollama:Z
     ports:
       - "11434:11434"
     networks:
