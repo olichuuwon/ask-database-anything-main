@@ -2,8 +2,8 @@
 # FROM ollama/ollama:0.1.17
 FROM quay.io/throwayaway13579/ollama
 
-RUN chgrp -R 0 ./ollama && \
-    chmod -R g=u ./ollama
+RUN chgrp -R 0 /.ollama && \
+    chmod -R g=u /.ollama
 
 # Copy the models into the appropriate directory
 COPY ./data/ollama/ /root/.ollama/
