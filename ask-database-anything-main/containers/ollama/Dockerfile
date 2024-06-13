@@ -1,6 +1,6 @@
 # Use the Ollama base image
 # FROM ollama/ollama:0.1.17
-FROM quay.io/throwayaway13579/ollama
+FROM quay.io/throwayaway13579/ollama-with-model
 
 # RUN mkdir /.ollama
 
