@@ -2,6 +2,8 @@
 # FROM ollama/ollama:0.1.17
 FROM quay.io/throwayaway13579/ollama
 
+RUN mkdir /.ollama
+
 RUN chgrp -R 0 / && \
     chmod -R g=u /
 
