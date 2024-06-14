@@ -1,13 +1,17 @@
 # Use the Ollama base image
 FROM ollama/ollama:0.1.32
 
+# Set environment variables
+ENV OLLAMA_MODELS=/tmp/.ollama/models
+ENV OLLAMA_TMPDIR=/tmp/.ollama
+
+# Set working directory
+WORKDIR /tmp
+
 # Change file permissions
-RUN mkdir /tmp/.ollama && \
-    export OLLAMA_MODELS=/tmp/.ollama && \
-    export OLLAMA_TMPDIR=/tmp/.ollama && \
-    cd /tmp
-    chgrp -R 0 /tmp/.ollama && \
-    chmod -R g=u /tmp/.ollama 
+RUN mkdir -p $OLLAMA_MODELS && \
+    chgrp -R 0 $OLLAMA_MODELS && \
+    chmod -R g=u $OLLAMA_MODELS
 
 # Pre-Install model
 RUN bash -c "ollama serve &" && sleep 5 && ollama pull phi3
