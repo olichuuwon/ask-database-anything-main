@@ -24,4 +24,8 @@ RUN mkdir -p /.ollama && \
 RUN chgrp -R 0 /.ollama && \
     chmod -R g=u /.ollama
 
+# Change permissions for the /.ollama directory
+RUN chgrp -R 0 /tmp && \
+    chmod -R g=u /tmp
+
 EXPOSE 11434
