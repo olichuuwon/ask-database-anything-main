@@ -2,12 +2,12 @@
 FROM bitnami/postgresql:16.3.0-debian-12-r14
 
 # Set environment variables for PostgreSQL
-ENV POSTGRES_USER=user
-ENV POSTGRES_PASSWORD=pass
-ENV POSTGRES_DB=chinook
+ENV POSTGRESQL_USERNAME=user
+ENV POSTGRESQL_PASSWORD=pass
+ENV POSTGRESQL_DATABASE=chinook
 
 # Copy initialization scripts to the /tmp directory
-COPY initdb/initdb.sql /tmp/initdb.sql
+COPY ./initdb/initdb.sql /tmp/
 
 # RUN psql chinook -U user -w -f /tmp/initdb.sql
 
@@ -18,4 +18,4 @@ EXPOSE 5432
 # RUN chown -R postgres:postgres /tmp
 
 # Run the SQL file to initialize the database
-RUN /opt/bitnami/postgresql/bin/psql -U $POSTGRES_USER -d $POSTGRES_DB -w -f /tmp/initdb.sql
+RUN psql -U $POSTGRESQL_USERNAME -w -d $POSTGRESQL_DATABASE -f /tmp/initdb.sql
