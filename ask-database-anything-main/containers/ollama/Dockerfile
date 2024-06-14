@@ -1,8 +1,10 @@
-# Use the Ollama base image
-FROM ollama/ollama:0.1.32
+FROM ollama/ollama
 
-# Expose the port if you have a service running on a specific port
+COPY ./run-ollama.sh /tmp/run-ollama.sh
+
+WORKDIR /tmp
+
+RUN chmod +x run-ollama.sh \
+    && ./run-ollama.sh
+
 EXPOSE 11434
-
-# Pre-Install model
-RUN bash -c "ollama serve &" && sleep 5 && ollama pull llama3:instruct
