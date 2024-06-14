@@ -111,7 +111,7 @@ def get_sql_chain(db: SQLDatabase):
     """
     
     prompt = ChatPromptTemplate.from_template(template)
-    llm = Ollama(model="llama3:instruct", base_url="http://model:11434", verbose=True)
+    llm = Ollama(model="llama3:instruct", base_url="http://postgres.ollama.svc.cluster.local:11434", verbose=True)
     
     def get_schema(_):
         return db.get_table_info()
@@ -139,7 +139,7 @@ def get_response(user_query: str, db: SQLDatabase, chat_history: list):
     SQL Response: {response}"""
   
     prompt = ChatPromptTemplate.from_template(template)
-    llm = Ollama(model="llama3:instruct", base_url="http://model:11434", verbose=True)
+    llm = Ollama(model="llama3:instruct", base_url="http://postgres.ollama.svc.cluster.local:11434", verbose=True)
     
     chain = (
         RunnablePassthrough.assign(query=sql_chain).assign(
@@ -170,8 +170,7 @@ def main():
     with st.sidebar:
         st.subheader("Connection to Postgres Database")
         st.write("Do ensure that you are connected to the database before asking anything.")
-        
-        host = st.text_input("Host", value="database")
+        host = st.text_input("Host", value="postgres.ollama.svc.cluster.local")
         port = st.text_input("Port", value="5432")
         user = st.text_input("User", value="user")
         password = st.text_input("Password", type="password", value="pass")
