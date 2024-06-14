@@ -1,10 +1,10 @@
 services:
   database:
-    image: "postgres:13"
+    image: "bitnami/postgresql:16.3.0-debian-12-r14"
     environment:
-      POSTGRES_DB: chinook
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: pass
+      POSTGRESQL_DATABASE: chinook
+      POSTGRESQL_USERNAME: user
+      POSTGRESQL_PASSWORD: pass
     volumes:
       - ./containers/postgres/initdb:/docker-entrypoint-initdb.d:Z
     networks:
