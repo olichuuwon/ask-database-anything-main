@@ -16,4 +16,4 @@ EXPOSE 5432
 # RUN chown -R postgres:postgres /tmp
 
 # Run the SQL file to initialize the database
-RUN /opt/bitnami/postgresql/bin/psql -U $POSTGRES_USER -d $POSTGRES_DB -f /tmp/init.sql
+RUN /opt/bitnami/postgresql/bin/psql -U $POSTGRES_USER -d $POSTGRES_DB -f /tmp/initdb.sql
