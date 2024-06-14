@@ -6,16 +6,14 @@ ENV POSTGRES_USER=user
 ENV POSTGRES_PASSWORD=pass
 ENV POSTGRES_DB=chinook
 
-# Copy initialization scripts to the Docker entrypoint directory
-# COPY initdb /docker-entrypoint-initdb.d/
+# Copy initialization scripts to the /tmp directory
 COPY initdb /tmp/
 
 # Expose the PostgreSQL port
 EXPOSE 5432
 
 # Ensure permissions are correct for the initialization scripts
-RUN chown -R postgres:postgres /docker-entrypoint-initdb.d
+RUN chown -R postgres:postgres /tmp
 
-# Run the SQL file to initialize the database (optional)
-# RUN /opt/bitnami/postgresql/bin/psql -U $POSTGRES_USER -d $POSTGRES_DB -f /docker-entrypoint-initdb.d/initdb.sql
-RUN /opt/bitnami/postgresql/bin/psql -U $POSTGRES_USER -d $POSTGRES_DB -f /tmp/initdb.sql
+# Run the SQL file to initialize the database
+RUN /opt/bitnami/postgresql/bin/psql -U $POSTGRES_USER -d $POSTGRES_DB -f /tmp/init.sql
