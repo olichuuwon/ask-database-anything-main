@@ -1,10 +1,14 @@
-FROM ollama/ollama
+# Use the Ollama base image
+FROM ollama/ollama:0.1.32
 
-COPY ./run-ollama.sh /tmp/run-ollama.sh
+# Change file permissions
+RUN mkdir ~/tmp/.ollama && \
+    export OLLAMA_MODELS=~/tmp/.ollama && \
+    export OLLAMA_TMPDIR=~/tmp/.ollama && \
+    chgrp -R 0 /tmp/.ollama && \
+    chmod -R g=u /tmp/.ollama 
 
-WORKDIR /tmp
-
-RUN chmod +x run-ollama.sh \
-    && ./run-ollama.sh
+# Pre-Install model
+RUN bash -c "ollama serve &" && sleep 5 && ollama pull phi3
 
 EXPOSE 11434
