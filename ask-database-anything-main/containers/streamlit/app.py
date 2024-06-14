@@ -111,7 +111,7 @@ def get_sql_chain(db: SQLDatabase):
     """
     
     prompt = ChatPromptTemplate.from_template(template)
-    llm = Ollama(model="llama3:instruct", base_url="http://postgres.ollama.svc.cluster.local:11434", verbose=True)
+    llm = Ollama(model="llama3:instruct", base_url="http://ollama.ollama.svc.cluster.local:11434", verbose=True)
     
     def get_schema(_):
         return db.get_table_info()
@@ -139,7 +139,7 @@ def get_response(user_query: str, db: SQLDatabase, chat_history: list):
     SQL Response: {response}"""
   
     prompt = ChatPromptTemplate.from_template(template)
-    llm = Ollama(model="llama3:instruct", base_url="http://postgres.ollama.svc.cluster.local:11434", verbose=True)
+    llm = Ollama(model="llama3:instruct", base_url="http://ollama.ollama.svc.cluster.local:11434", verbose=True)
     
     chain = (
         RunnablePassthrough.assign(query=sql_chain).assign(
