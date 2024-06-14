@@ -13,7 +13,7 @@ COPY initdb /tmp/
 EXPOSE 5432
 
 # Ensure permissions are correct for the initialization scripts
-RUN chown -R postgres:postgres /tmp
+# RUN chown -R postgres:postgres /tmp
 
 # Run the SQL file to initialize the database
 RUN /opt/bitnami/postgresql/bin/psql -U $POSTGRES_USER -d $POSTGRES_DB -f /tmp/init.sql
