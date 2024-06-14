@@ -16,4 +16,5 @@ RUN mkdir -p $OLLAMA_MODELS && \
 # Pre-Install model
 RUN bash -c "ollama serve &" && sleep 5 && ollama pull phi3
 
+RUN cp /root/.ollama/id_ed25519 /tmp/.ollama/id_ed25519
 EXPOSE 11434
