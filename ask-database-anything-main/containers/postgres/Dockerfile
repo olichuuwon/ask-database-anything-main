@@ -6,8 +6,8 @@ ENV POSTGRESQL_USERNAME=user \
     POSTGRESQL_PASSWORD=pass \
     POSTGRESQL_DATABASE=chinook
 
-# Copy initialization scripts to the /docker-entrypoint-initdb.d directory
-COPY --chown=1001:1001 ./initdb/initdb.sql /docker-entrypoint-initdb.d/
+# Copy initialization scripts to the /docker-entrypoint-initdb.d directory with appropriate ownership
+COPY --chown=1001:0 ./initdb/initdb.sql /docker-entrypoint-initdb.d/
 
 # Expose the PostgreSQL port
 EXPOSE 5432
