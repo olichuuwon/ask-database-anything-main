@@ -32,14 +32,35 @@ services:
             count: 1
             capabilities: [gpu]
 
+  minio:
+    image: 'bitnami/minio:latest'
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    environment:
+      - MINIO_ROOT_USER=minio-root-user
+      - MINIO_ROOT_PASSWORD=minio-root-password
+    networks:
+      - app_network
+      
+  # myapp:
+  #   image: 'YOUR_APPLICATION_IMAGE'
+  #   networks:
+  #     - app-tier
+  #   environment:
+  #     - MINIO_SERVER_ACCESS_KEY=minio-access-key
+  #     - MINIO_SERVER_SECRET_KEY=minio-secret-key
+
   application:  # Streamlit application service definition
     build: ./containers/streamlit/  # Specify the directory of the Dockerfile
     environment:
-      - DB_HOST=database  # Use the service name 'db' for database host
+      - DB_HOST=database  # Use the service name 'database' for database host
+      - MINIO_SERVER_ACCESS_KEY=minio-access-key
+      - MINIO_SERVER_SECRET_KEY=minio-secret-key
     ports:
       - "8501:8501"  # Default port for Streamlit
     depends_on:
-      - database  # This service depends on 'db' service
+      - database  # This service depends on 'database' service
       - model  # This service depends on 'model' service
     networks:
       - app_network
