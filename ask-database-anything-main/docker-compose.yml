@@ -1,6 +1,6 @@
 services:
   database:
-    image: "bitnami/postgresql:16.3.0-debian-12-r14"
+    image:  "postgres:13" # "bitnami/postgresql:16.3.0-debian-12-r14"
     environment:
       POSTGRESQL_DATABASE: chinook
       POSTGRESQL_USERNAME: user
