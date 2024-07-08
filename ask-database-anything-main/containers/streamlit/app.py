@@ -9,7 +9,6 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_community.utilities import SQLDatabase
 from langchain_community.llms import Ollama
 
-
 def get_table_schema(engine, table_name: str) -> PrettyTable:
     """Retrieve and format the schema of a given table."""
     inspector = inspect(engine)
@@ -21,7 +20,6 @@ def get_table_schema(engine, table_name: str) -> PrettyTable:
         schema_table.add_row([column['name'], column['type']])
     
     return schema_table
-
 
 def get_sample_data(engine, table_name: str, sample_size: int = 1) -> PrettyTable:
     """Retrieve and format sample data from a given table."""
@@ -36,7 +34,6 @@ def get_sample_data(engine, table_name: str, sample_size: int = 1) -> PrettyTabl
     
     return sample_data_table
 
-
 def display_table_info(db_uri: str, sample_size: int = 1) -> None:
     """Display schema and sample data for all tables in the database."""
     engine = create_engine(db_uri)
@@ -48,17 +45,14 @@ def display_table_info(db_uri: str, sample_size: int = 1) -> None:
         print("\nSample Data:")
         print(get_sample_data(engine, table_name, sample_size))
 
-
 def init_database(user: str, password: str, host: str, port: str, database: str) -> SQLDatabase:
     """Initialize and return a connection to the database."""
     db_uri = uri_database(user, password, host, port, database)
     return SQLDatabase.from_uri(db_uri)
 
-
 def uri_database(user: str, password: str, host: str, port: str, database: str) -> str:
     """Create and return the database URI."""
     return f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}"
-
 
 def get_sql_chain(db: SQLDatabase):
     """Create and return an SQL query chain based on the database schema."""
@@ -123,7 +117,6 @@ def get_sql_chain(db: SQLDatabase):
         | StrOutputParser()
     )
 
-
 def get_response(user_query: str, db: SQLDatabase, chat_history: list):
     """Generate a response based on the user's query and the database schema."""
     sql_chain = get_sql_chain(db)
@@ -160,40 +153,15 @@ def get_response(user_query: str, db: SQLDatabase, chat_history: list):
     
     return result
 
-
-def main():
-    st.set_page_config(page_title="Database Q&A", page_icon=":speech_balloon:")
-
-    st.title("Ask Database Anything")
-
-    # Sidebar for database connection inputs
-    with st.sidebar:
-        st.subheader("Connection to Postgres Database")
-        st.write("Do ensure that you are connected to the database before asking anything.")
-        host = st.text_input("Host", value="postgres.ollama.svc.cluster.local")
-        port = st.text_input("Port", value="5432")
-        user = st.text_input("User", value="user")
-        password = st.text_input("Password", type="password", value="pass")
-        database = st.text_input("Database", value="chinook")
-        
-        if st.button("Connect"):
-            with st.spinner("Connecting to database..."):
-                try:
-                    db = init_database(user, password, host, port, database)
-                    st.session_state.db = db
-                    st.success("Connected to database!")
-                    display_table_info(uri_database(user, password, host, port, database))
-                except Exception as e:
-                    st.error(f"Failed to connect to database: {e}")
+def llama_page():
+    st.title("Direct Llama Interaction")
 
     # Initialize chat history in session state if not already done
-    if "chat_history" not in st.session_state:
-        st.session_state.chat_history = [
-            AIMessage(content="Hello! Feel free to ask me anything about your database after establishing connection."),
-        ]
+    if "llama_chat_history" not in st.session_state:
+        st.session_state.llama_chat_history = []
 
     # Display chat history
-    for message in st.session_state.chat_history:
+    for message in st.session_state.llama_chat_history:
         if isinstance(message, AIMessage):
             with st.chat_message("AI"):
                 st.markdown(message.content)
@@ -202,19 +170,80 @@ def main():
                 st.markdown(message.content)
 
     # Input for user query
-    user_query = st.chat_input("Type a message...")
+    user_query = st.chat_input("Type a message to Llama...")
     if user_query is not None and user_query.strip() != "":
-        st.session_state.chat_history.append(HumanMessage(content=user_query))
+        st.session_state.llama_chat_history.append(HumanMessage(content=user_query))
         
         with st.chat_message("Human"):
             st.markdown(user_query)
             
         with st.chat_message("AI"):
-            response = get_response(user_query, st.session_state.db, st.session_state.chat_history)
+            llm = Ollama(model="llama3:instruct", base_url="http://ollama.ollama.svc.cluster.local:11434", verbose=True)
+            response = llm(user_query)
             st.markdown(response)
             
-        st.session_state.chat_history.append(AIMessage(content=response))
+        st.session_state.llama_chat_history.append(AIMessage(content=response))
 
+def main():
+    st.set_page_config(page_title="Database Q&A and Llama Interaction", page_icon=":speech_balloon:")
+
+    st.sidebar.title("Navigation")
+    page = st.sidebar.radio("Go to", ["Database Q&A", "Direct Llama Interaction"])
+
+    if page == "Database Q&A":
+        st.title("Ask Database Anything")
+
+        # Sidebar for database connection inputs
+        with st.sidebar:
+            st.subheader("Connection to Postgres Database")
+            st.write("Do ensure that you are connected to the database before asking anything.")
+            host = st.text_input("Host", value="postgres.ollama.svc.cluster.local")
+            port = st.text_input("Port", value="5432")
+            user = st.text_input("User", value="user")
+            password = st.text_input("Password", type="password", value="pass")
+            database = st.text_input("Database", value="chinook")
+            
+            if st.button("Connect"):
+                with st.spinner("Connecting to database..."):
+                    try:
+                        db = init_database(user, password, host, port, database)
+                        st.session_state.db = db
+                        st.success("Connected to database!")
+                        display_table_info(uri_database(user, password, host, port, database))
+                    except Exception as e:
+                        st.error(f"Failed to connect to database: {e}")
+
+        # Initialize chat history in session state if not already done
+        if "chat_history" not in st.session_state:
+            st.session_state.chat_history = [
+                AIMessage(content="Hello! Feel free to ask me anything about your database after establishing connection."),
+            ]
+
+        # Display chat history
+        for message in st.session_state.chat_history:
+            if isinstance(message, AIMessage):
+                with st.chat_message("AI"):
+                    st.markdown(message.content)
+            elif isinstance(message, HumanMessage):
+                with st.chat_message("Human"):
+                    st.markdown(message.content)
+
+        # Input for user query
+        user_query = st.chat_input("Type a message...")
+        if user_query is not None and user_query.strip() != "":
+            st.session_state.chat_history.append(HumanMessage(content=user_query))
+            
+            with st.chat_message("Human"):
+                st.markdown(user_query)
+                
+            with st.chat_message("AI"):
+                response = get_response(user_query, st.session_state.db, st.session_state.chat_history)
+                st.markdown(response)
+                
+            st.session_state.chat_history.append(AIMessage(content=response))
+
+    elif page == "Direct Llama Interaction":
+        llama_page()
 
 if __name__ == "__main__":
     main()

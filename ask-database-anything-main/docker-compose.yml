@@ -1,54 +1,36 @@
 services:
+
   database:
-    image: "postgres:13"
+    image: "bitnami/postgresql:16.3.0-debian-12-r14"
     environment:
-      POSTGRES_DB: chinook
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: pass
-  # database:
-  #   image: "bitnami/postgresql:16.3.0-debian-12-r14"
-  #   environment:
-  #     POSTGRESQL_DATABASE: chinook
-  #     POSTGRESQL_USERNAME: user
-  #     POSTGRESQL_PASSWORD: pass
+      POSTGRESQL_DATABASE: chinook
+      POSTGRESQL_USERNAME: user
+      POSTGRESQL_PASSWORD: pass
     volumes:
       - ./containers/postgres/initdb:/docker-entrypoint-initdb.d:Z
     networks:
       - app_network
 
   model:
-    image: "ollama/ollama"
+    image: "jieshilyn/ollama-llama-8"
     volumes:
       - ./data/.ollama:/root/.ollama:Z
     ports:
       - "11434:11434"
     networks:
         - app_network
-    deploy:
-      resources:
-        reservations:
-          devices:
-          - driver: nvidia
-            count: 1
-            capabilities: [gpu]
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #         - driver: nvidia
+  #           count: 1
+  #           capabilities: [gpu]
 
-  minio:
-    image: 'bitnami/minio:latest'
-    ports:
-      - '9000:9000'
-      - '9001:9001'
-    environment:
-      - MINIO_ROOT_USER=minio-root-user
-      - MINIO_ROOT_PASSWORD=minio-root-password
-    networks:
-      - app_network
-     
   application:  # Streamlit application service definition
     build: ./containers/streamlit/  # Specify the directory of the Dockerfile
     environment:
       - DB_HOST=database  # Use the service name 'database' for database host
-      - MINIO_SERVER_ACCESS_KEY=minio-access-key
-      - MINIO_SERVER_SECRET_KEY=minio-secret-key
     ports:
       - "8501:8501"  # Default port for Streamlit
     depends_on:

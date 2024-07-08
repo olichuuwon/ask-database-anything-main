@@ -1,5 +1,5 @@
 # Use the Ollama base image
-FROM ollama/ollama:0.1.32
+FROM ollama/ollama:latest
 
 # Set environment variables
 ENV OLLAMA_MODELS=/tmp/.ollama/models
