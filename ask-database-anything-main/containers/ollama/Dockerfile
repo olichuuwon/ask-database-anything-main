@@ -1,5 +1,5 @@
 # Use the Ollama base image
-FROM ollama/ollama:latest
+FROM jieshilyn/ollama-llama-8:latest
 
 # Set environment variables
 ENV OLLAMA_MODELS=/tmp/.ollama/models
