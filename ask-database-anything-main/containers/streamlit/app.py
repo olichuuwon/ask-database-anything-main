@@ -105,7 +105,7 @@ def get_sql_chain(db: SQLDatabase):
     """
     
     prompt = ChatPromptTemplate.from_template(template)
-    llm = Ollama(model="llama3:instruct", base_url="http://ollama.ollama.svc.cluster.local:11434", verbose=True)
+    llm = Ollama(model="llama3:instruct", base_url="http://model:11434", verbose=True)
     
     def get_schema(_):
         return db.get_table_info()
@@ -132,7 +132,7 @@ def get_response(user_query: str, db: SQLDatabase, chat_history: list):
     SQL Response: {response}"""
   
     prompt = ChatPromptTemplate.from_template(template)
-    llm = Ollama(model="llama3:instruct", base_url="http://ollama.ollama.svc.cluster.local:11434", verbose=True)
+    llm = Ollama(model="llama3:instruct", base_url="http://model:11434", verbose=True)
     
     chain = (
         RunnablePassthrough.assign(query=sql_chain).assign(
@@ -154,11 +154,13 @@ def get_response(user_query: str, db: SQLDatabase, chat_history: list):
     return result
 
 def llama_page():
-    st.title("Direct Llama Interaction")
+    st.title("General Mode")
 
     # Initialize chat history in session state if not already done
     if "llama_chat_history" not in st.session_state:
-        st.session_state.llama_chat_history = []
+            st.session_state.llama_chat_history = [
+                AIMessage(content="Hello! Feel free to ask me about anything."),
+            ]
 
     # Display chat history
     for message in st.session_state.llama_chat_history:
@@ -170,7 +172,7 @@ def llama_page():
                 st.markdown(message.content)
 
     # Input for user query
-    user_query = st.chat_input("Type a message to Llama...")
+    user_query = st.chat_input("Type a message...")
     if user_query is not None and user_query.strip() != "":
         st.session_state.llama_chat_history.append(HumanMessage(content=user_query))
         
@@ -178,26 +180,26 @@ def llama_page():
             st.markdown(user_query)
             
         with st.chat_message("AI"):
-            llm = Ollama(model="llama3:instruct", base_url="http://ollama.ollama.svc.cluster.local:11434", verbose=True)
+            llm = Ollama(model="llama3:instruct", base_url="http://model:11434", verbose=True)
             response = llm(user_query)
             st.markdown(response)
             
         st.session_state.llama_chat_history.append(AIMessage(content=response))
 
 def main():
-    st.set_page_config(page_title="Database Q&A and Llama Interaction", page_icon=":speech_balloon:")
+    st.set_page_config(page_title="AI Tools", page_icon=":speech_balloon:")
 
-    st.sidebar.title("Navigation")
-    page = st.sidebar.radio("Go to", ["Database Q&A", "Direct Llama Interaction"])
+    st.sidebar.title("Different Modes")
+    page = st.sidebar.radio("Go to", ["Database Mode", "General Mode"])
 
-    if page == "Database Q&A":
-        st.title("Ask Database Anything")
+    if page == "Database Mode":
+        st.title("Database Mode")
 
         # Sidebar for database connection inputs
         with st.sidebar:
             st.subheader("Connection to Postgres Database")
             st.write("Do ensure that you are connected to the database before asking anything.")
-            host = st.text_input("Host", value="postgres.ollama.svc.cluster.local")
+            host = st.text_input("Host", value="database")
             port = st.text_input("Port", value="5432")
             user = st.text_input("User", value="user")
             password = st.text_input("Password", type="password", value="pass")
@@ -216,7 +218,7 @@ def main():
         # Initialize chat history in session state if not already done
         if "chat_history" not in st.session_state:
             st.session_state.chat_history = [
-                AIMessage(content="Hello! Feel free to ask me anything about your database after establishing connection."),
+                AIMessage(content="Hello! Feel free to ask me anything about your database."),
             ]
 
         # Display chat history
@@ -242,7 +244,7 @@ def main():
                 
             st.session_state.chat_history.append(AIMessage(content=response))
 
-    elif page == "Direct Llama Interaction":
+    elif page == "General Mode":
         llama_page()
 
 if __name__ == "__main__":

@@ -12,7 +12,7 @@ services:
       - app_network
 
   model:
-    image: "jieshilyn/ollama-llama-8"
+    image: "jieshilyn/ollama-patched"
     volumes:
       - ./data/.ollama:/root/.ollama:Z
     ports:
